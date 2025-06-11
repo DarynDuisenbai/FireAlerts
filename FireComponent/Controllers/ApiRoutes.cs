@@ -13,6 +13,7 @@
             public const string SendVerificationCode = Base + "/users/sendCodeEmail";
             public const string VerifyEmail = Base + "/users/verifyEmail";
             public const string GetProfile = Base + "/users/getProfile";
+            public const string UserLocation = Base + "/users/location";
         }
         public static class Admin
         {

@@ -141,8 +141,8 @@ namespace WebApi.Controllers.User
             }
         }
 
-        [HttpPost(ApiRoutes.Users.GetProfile)]
-        public async Task<ActionResult<bool>> PostUserLocation([FromQuery] UserLocation model)
+        [HttpPost(ApiRoutes.Users.UserLocation)]
+        public async Task<ActionResult<bool>> UserLocation([FromBody] UserLocationDto model)
         {
             try
             {

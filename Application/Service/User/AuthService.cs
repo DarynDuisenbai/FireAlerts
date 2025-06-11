@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Application.DTOs.Identity;
 using Domain.Entities.Identity;
 using Domain.Entities.FireData;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace Application.Service.User
 {
@@ -18,7 +19,7 @@ namespace Application.Service.User
         private readonly IMongoCollection<Domain.Entities.Identity.User> _users;
         private readonly IOptions<JwtSettings> _jwtSettings;
         private readonly IMongoCollection<EmailVerificationCode> _verificationCodes;
-        private readonly IMongoCollection<UserLocation> _userLocationCollection;
+        private readonly IMongoCollection<CrowdSourcingData> _crowdSourcingData;
         private readonly IEmailService _emailService;
 
 
@@ -31,7 +32,7 @@ namespace Application.Service.User
             var database = client.GetDatabase(mongoSettings.Value.DatabaseName);
             _users = database.GetCollection<Domain.Entities.Identity.User>("Users");
             _verificationCodes = database.GetCollection<EmailVerificationCode>("EmailVerificationCodes");
-            _userLocationCollection = database.GetCollection<UserLocation>("UserLocation");
+            _crowdSourcingData = database.GetCollection<CrowdSourcingData>("CrowdSourcingData");
             _jwtSettings = jwtSettings;
             _emailService = emailService;
         }
@@ -222,18 +223,44 @@ namespace Application.Service.User
             };
         }
 
-        public async Task<bool> PostLocationUser(UserLocation model)
+        public async Task<bool> PostLocationUser(UserLocationDto model)
         {
-            try
+
+            if (string.IsNullOrWhiteSpace(model.UsertId))
+                throw new ArgumentException("UserId не должен быть пустым");
+
+
+            var recentFires = await _crowdSourcingData
+                .Find(f => f.Time_fire >= model.time.AddMinutes(-5))
+                .ToListAsync();
+
+            foreach (var fire in recentFires)
             {
-                await _userLocationCollection.InsertOneAsync(model);
-                return true;
+                var distance = GetDistanceInKm(model.lat, model.lng, fire.Latitude, fire.Longitude);
+                if (distance <= 1.0)
+                    return true;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при сохранении локации пользователя: {ex.Message}");
-                return false;
-            }
+
+            return false;
+        }
+
+        private double GetDistanceInKm(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 6371; 
+            var dLat = DegreesToRadians(lat2 - lat1);
+            var dLon = DegreesToRadians(lon2 - lon1);
+
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(DegreesToRadians(lat1)) * Math.Cos(DegreesToRadians(lat2)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
+        private double DegreesToRadians(double degrees)
+        {
+            return degrees * Math.PI / 180;
         }
     }
 }
