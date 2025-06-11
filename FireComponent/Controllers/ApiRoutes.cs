@@ -36,5 +36,20 @@
             public const string UpdateWebhook = Base + "/webhook/update";
             public const string SendNotification = Base + "/webhook/sendNotification";
         }
+        public static class Support
+        {
+            public const string CreateTicket = "create-ticket";
+            public const string SendMessage = "send-message";
+            public const string MyChats = "my-chats";
+            public const string GetChat = "chat/{chatId}";
+            public const string MarkAsRead = "mark-as-read/{chatId}";
+
+            // Маршруты для менеджеров
+            public const string AllChats = "manager/all-chats";
+            public const string MyAssignedChats = "manager/my-assigned-chats";
+            public const string AssignChat = "manager/assign-chat/{chatId}";
+            public const string CloseChat = "manager/close-chat/{chatId}";
+            public const string ChatStats = "manager/stats";
+        }
     }
 }

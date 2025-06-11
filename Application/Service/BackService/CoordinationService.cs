@@ -22,9 +22,13 @@
             {
                 try
                 {
+                    // Обработка данных NASA
                     await _nasaFirmsService.ProcessFireData();
+
+                    // Очистка дубликатов
                     await _cleanupService.RemoveDuplicates();
-                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
                 catch (Exception ex)
                 {

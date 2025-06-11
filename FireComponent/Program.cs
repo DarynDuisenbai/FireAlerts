@@ -12,6 +12,7 @@ using MongoDB.Driver;
 using Application.Service.CrowdService;
 using Application.Service.Integration;
 using Application.Settings;
+using Application.Service.Support;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,7 @@ builder.Services.AddHostedService<CoordinationService>();
 builder.Services.AddScoped<IPhotoVerificationService, PhotoVerificationService>();
 builder.Services.AddScoped<ICrowdService, CrowdService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISupportChatService, SupportChatService>();
 
 // Настройка JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
