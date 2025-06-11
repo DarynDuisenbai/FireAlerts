@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Identity;
+using Domain.Entities.FireData;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Interfaces
@@ -13,6 +14,7 @@ namespace Application.Interfaces
         Task<bool> VerifyEmailAsync(string email, string code);
         Task<UserProfileDto> GetProfileAsync(string userId);
         Task<List<Domain.Entities.Identity.User>> GetAllUsers();
+        Task<bool> PostLocationUser(UserLocation model);
 
     }
 }

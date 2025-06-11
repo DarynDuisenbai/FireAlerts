@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.EmailDto;
 using Application.DTOs.Identity;
 using Application.Interfaces;
+using Domain.Entities.FireData;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.User
@@ -132,6 +133,20 @@ namespace WebApi.Controllers.User
             try
             {
                 var result = await _authService.GetProfileAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost(ApiRoutes.Users.GetProfile)]
+        public async Task<ActionResult<bool>> PostUserLocation([FromQuery] UserLocation model)
+        {
+            try
+            {
+                var result = await _authService.PostLocationUser(model);
                 return Ok(result);
             }
             catch (Exception ex)

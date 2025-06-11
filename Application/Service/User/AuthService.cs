@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Application.DTOs.Identity;
 using Domain.Entities.Identity;
+using Domain.Entities.FireData;
 
 namespace Application.Service.User
 {
@@ -17,6 +18,7 @@ namespace Application.Service.User
         private readonly IMongoCollection<Domain.Entities.Identity.User> _users;
         private readonly IOptions<JwtSettings> _jwtSettings;
         private readonly IMongoCollection<EmailVerificationCode> _verificationCodes;
+        private readonly IMongoCollection<UserLocation> _userLocationCollection;
         private readonly IEmailService _emailService;
 
 
@@ -29,6 +31,7 @@ namespace Application.Service.User
             var database = client.GetDatabase(mongoSettings.Value.DatabaseName);
             _users = database.GetCollection<Domain.Entities.Identity.User>("Users");
             _verificationCodes = database.GetCollection<EmailVerificationCode>("EmailVerificationCodes");
+            _userLocationCollection = database.GetCollection<UserLocation>("UserLocation");
             _jwtSettings = jwtSettings;
             _emailService = emailService;
         }
@@ -217,6 +220,20 @@ namespace Application.Service.User
                 Roles = user.Roles,
                 CreatedAt = user.CreatedAt
             };
+        }
+
+        public async Task<bool> PostLocationUser(UserLocation model)
+        {
+            try
+            {
+                await _userLocationCollection.InsertOneAsync(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при сохранении локации пользователя: {ex.Message}");
+                return false;
+            }
         }
     }
 }
