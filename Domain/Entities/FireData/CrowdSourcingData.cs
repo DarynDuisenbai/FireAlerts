@@ -13,6 +13,8 @@ namespace Domain.Entities.FireData
         public DateTime Time_fire { get; set; }
         public string Photo { get; set; }
         public string Definition { get; set; }
+        public FireStatus Status { get; set; } = FireStatus.New; // Новое поле статуса
+
     }
 }
 

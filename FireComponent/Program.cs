@@ -47,6 +47,9 @@ builder.Services.AddScoped<IPhotoVerificationService, PhotoVerificationService>(
 builder.Services.AddScoped<ICrowdService, CrowdService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISupportChatService, SupportChatService>();
+builder.Services.AddScoped<ITelegramBotService, TelegramBotService>();
+
+
 
 // Настройка JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

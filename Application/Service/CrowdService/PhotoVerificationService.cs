@@ -14,11 +14,13 @@ namespace Application.Service.CrowdService
     public class PhotoVerificationService : IPhotoVerificationService
     {
         private readonly IMongoCollection<CrowdSourcingData> _crowdSourcingData;
-        public PhotoVerificationService(IOptions<MongoDbSettings> mongoSettings)
+        private readonly ITelegramBotService _telegramBotService;
+        public PhotoVerificationService(IOptions<MongoDbSettings> mongoSettings, ITelegramBotService telegramBotService)
         {
             var mongoClient = new MongoClient(mongoSettings.Value.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.Value.DatabaseName);
             _crowdSourcingData = database.GetCollection<CrowdSourcingData>(nameof(CrowdSourcingData));
+            _telegramBotService = telegramBotService;
         }
 
         public async Task<bool> VerifyAndSavePhotoAsync(VerifyPhotoRequest request)
@@ -52,10 +54,14 @@ namespace Application.Service.CrowdService
                         Address = address,
                         Time_fire = DateTime.UtcNow,
                         Photo = request.PhotoBase64,
-                        Definition = request.Definition
+                        Definition = request.Definition,
+                        Status = FireStatus.New // По умолчанию новый
                     };
 
                     await _crowdSourcingData.InsertOneAsync(crowdSourcingData);
+
+                    // Сразу отправляем в Telegram каналы
+                    await _telegramBotService.SendNewFireNotificationAsync(crowdSourcingData);
                 }
 
                 return isValid;

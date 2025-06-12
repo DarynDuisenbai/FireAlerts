@@ -45,6 +45,5 @@ namespace WebApi.Controllers.Fire
                 return BadRequest(new { message = ex.Message });
             }
         }
-
     }
 }
